@@ -16,42 +16,55 @@ import java.util.stream.Collectors;
 public class SolicitacaoService {
 
     @Autowired
-    private SolicitacaoRepository repository;
+    private SolicitacaoRepository solicitacaoRepository;
 
-    public List<SolicitacaoResponseDTO> listarTodos() {
-        return repository.findAll()
+    public List<SolicitacaoResponseDTO> listarTodas() {
+        return solicitacaoRepository.findAll()
                 .stream()
-                .map(this::toResponse)
+                .map(this::converterParaResponseDTO)
                 .collect(Collectors.toList());
     }
 
     public SolicitacaoResponseDTO buscarPorId(Long id) {
-        Solicitacao s = repository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitação não encontrada: " + id));
-        return toResponse(s);
+        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitação não encontrada com ID: " + id));
+        return converterParaResponseDTO(solicitacao);
     }
 
-    public SolicitacaoResponseDTO salvar(SolicitacaoRequestDTO dto) {
-        Solicitacao s = new Solicitacao();
-        s.setSoftware(dto.getSoftware());
-        s.setSolicitante(dto.getSolicitante());
-        s.setDataSolicitacao(LocalDate.now());
+    public SolicitacaoResponseDTO criar(SolicitacaoRequestDTO requestDTO) {
+        Solicitacao solicitacao = new Solicitacao();
+        solicitacao.setSoftware(requestDTO.getSoftware());
+        solicitacao.setSolicitante(requestDTO.getSolicitante());
+        solicitacao.setDataSolicitacao(LocalDate.now());
 
-        return toResponse(repository.save(s));
+        Solicitacao solicitacaoSalva = solicitacaoRepository.save(solicitacao);
+        return converterParaResponseDTO(solicitacaoSalva);
     }
 
-    public void excluir(Long id) {
-        if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Solicitação não encontrada: " + id);
+    public SolicitacaoResponseDTO atualizar(Long id, SolicitacaoRequestDTO requestDTO) {
+        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitação não encontrada com ID: " + id));
+
+        solicitacao.setSoftware(requestDTO.getSoftware());
+        solicitacao.setSolicitante(requestDTO.getSolicitante());
+
+        Solicitacao solicitacaoAtualizada = solicitacaoRepository.save(solicitacao);
+        return converterParaResponseDTO(solicitacaoAtualizada);
+    }
+
+    public void deletar(Long id) {
+        if (!solicitacaoRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Solicitação não encontrada com ID: " + id);
         }
-        repository.deleteById(id);
+        solicitacaoRepository.deleteById(id);
     }
 
-    private SolicitacaoResponseDTO toResponse(Solicitacao s) {
+    private SolicitacaoResponseDTO converterParaResponseDTO(Solicitacao solicitacao) {
         return new SolicitacaoResponseDTO(
-                s.getId(),
-                s.getSoftware(),
-                s.getSolicitante(),
-                s.getDataSolicitacao());
+                solicitacao.getId(),
+                solicitacao.getSoftware(),
+                solicitacao.getSolicitante(),
+                solicitacao.getDataSolicitacao()
+        );
     }
 }
