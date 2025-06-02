@@ -1,4 +1,3 @@
-// 1. SolicitacaoController.java
 package com.ms.solici.controller;
 
 import com.ms.solici.dto.SolicitacaoRequestDTO;
