@@ -51,8 +51,8 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>2.1.214</version> <!-- ou última versão estável -->
-			<scope>runtime</scope>
+		
+			<!-- <scope>runtime</scope> -->
 		</dependency>
 
 		<!-- PostgreSQL -->
